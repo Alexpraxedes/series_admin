@@ -3,8 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProvisionServer;
 use App\Http\Controllers\SerieController;
+use App\Http\Controllers\SeasonController;
+use App\Http\Controllers\EpisodeController;
 
-Route::resource('/series', SerieController::class);
+Route::resources([
+    'series'    => SerieController::class,
+    'seasons'   => SeasonController::class,
+    'episodes'  => EpisodeController::class,
+]);
 
 Auth::routes();
 

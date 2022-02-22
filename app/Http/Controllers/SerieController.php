@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Services\{ Seasons, Episodes, Series };
+use App\Http\Requests\SeriesFormRequest;
+use App\Models\{Serie, Season, Episode};
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use App\Models\Serie;
-use App\Http\Requests\SeriesFormRequest;
 
 class SerieController extends Controller
 {
@@ -28,7 +29,7 @@ class SerieController extends Controller
      */
     public function create()
     {
-        return view('series/create')->with('action','create');
+        return view('series/create');
     }
 
     /**
@@ -37,14 +38,17 @@ class SerieController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SeriesFormRequest $request)
-    {
-        $serie = new Serie();
-        $serie->title = $request->title;
-        $serie->save();
+    public function store(SeriesFormRequest $request, Series $serie)
+    {   
+        $serie_new = new Series;
+        $serie_new = $serie->create($request);
+
+        $seasons_quantity = $request->seasons_quantity;
+        $episodes_quantity = $request->episodes_quantity;
+
         $request->session()->put('message',[
             'type' => 'success',
-            'body' => 'Série '.$serie->title.' criada com sucesso!'
+            'body' => 'A série '.$serie_new->title.' com suas temporadas('.$seasons_quantity.') e epsodios('.$episodes_quantity.') foi criada com sucesso!'
         ]);
 
         return Redirect::route('series.index');
@@ -67,9 +71,11 @@ class SerieController extends Controller
      * @param  \App\Models\Serie  $serie
      * @return \Illuminate\Http\Response
      */
-    public function edit($uuid)
+    public function edit($uuid, Request $request)
     {
-        //
+        $serie = Serie::find($uuid);
+        $message = $request->session()->get('message');
+        return view('series/edit', compact('serie', 'message'));
     }
 
     /**
@@ -79,9 +85,17 @@ class SerieController extends Controller
      * @param  \App\Models\Serie  $serie
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $uuid)
+    public function update(SeriesFormRequest $request, Series $serie, $uuid)
     {
-        //
+        $serie_up = Serie::find($uuid);
+        $serie = $serie->update($request, $serie_up);
+
+        $request->session()->put('message',[
+            'type' => 'success',
+            'body' => 'A série '.$serie_up->title.' foi editada com sucesso com sucesso!'
+        ]);
+                
+        return redirect()->back();
     }
 
     /**
@@ -90,13 +104,13 @@ class SerieController extends Controller
      * @param  \App\Models\Serie  $serie
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $uuid)
+    public function destroy(Request $request, $uuid, Series $serie)
     {
-        $serie = Serie::find($uuid);
-        $serie->delete();
+        $serie_deleted = $serie->delete($uuid);
+        
         $request->session()->put('message',[
             'type' => 'danger',
-            'body' => 'Série deletada com sucesso!'
+            'body' => 'A série '.$serie_deleted.' foi deletada com sucesso!'
         ]);
 
         return Redirect::route('series.index');

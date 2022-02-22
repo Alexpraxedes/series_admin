@@ -11,19 +11,13 @@
                 </div>
             </div>
 
-            @if($message)
-                <div>                  
-                    <div class="alert alert-{{ $message['type'] }} d-flex align-items-center alert-dismissible fade show" role="alert">
-                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
-                        <div>{{ $message['body'] }}</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-            @endif
+            @include( 'layouts.message', ['message' => $message] )
+
             <div>
                 <table class="table table-hover">
                     <thead class="table-secondary">
                         <tr class="">
+                            <th class="col-1">Imagem</th>
                             <th class="col">Título da Série</th>
                             <th class="col-1 text-center">Ações</th>
                         </tr>
@@ -38,13 +32,28 @@
                         @else
                             @foreach( $series as $serie )
                             <tr class="align-items-center">
-                                <th class="col"><p class="pt-1 m-auto">{{ $serie->title }}</p></th>
+                                <th class="col-1">
+                                    <figure class="figure">
+                                        <img src="img/series/{{ $serie->image }}" alt="{{ $serie->title }}" class="figure-img img-fluid rounded">
+                                    </figure>
+                                </th>
+                                <td class="col">
+                                    <p id="serie-{{ $serie->id }}" class="pt-1 m-auto"><b>{{ $serie->title }}</b></p>
+                                    <span class="badge bg-secondary">
+                                        Temporadas <span class="badge bg-light text-dark">{{ $serie->seasons->count() }}</span>
+                                    </span>
+                                    <span class="badge bg-info">
+                                        Episódios <span class="badge bg-light text-dark">{{ $serie->seasons->getWatchedEpisodes()->count() }} / {{ $serie->seasons->getAllEpisodes()->count() }}</span>
+                                    </span>
+                                </td>
                                 <td class="col-1 p-0">
-                                    <div class="col-auto btn-group btn-group-sm p-1" role="group">
-                                        <a href="{{ route('series.destroy', [$serie->uuid]) }}" type="button" class="btn btn-outline-secondary rounded-0 rounded-start align-items-center d-flex fs-5 p-2">
+                                    <div class="col-auto btn-group btn-group-sm p-1 mt-3" role="group">
+                                        <a href="{{ route('seasons.show', [$serie->uuid]) }}" type="button" class="btn btn-outline-secondary rounded-0 rounded-start align-items-center d-flex fs-5 p-2">
+                                            <i data-fa-symbol="view" class="fa-regular fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('series.edit', [$serie->uuid]) }}" type="button" class="series-edit btn btn-outline-secondary rounded-0 align-items-center d-flex fs-5 p-2" style="margin-right: -1px;">
                                             <i data-fa-symbol="edit" class="fa-regular fa-pen-to-square"></i>
                                         </a>
-
                                         <form method="POST" class="m-0" action="{{route('series.destroy', $serie->uuid) }}" onsubmit="return confirm('Deseja realmente excluir a série {{$serie->title}}?')" >
                                             @method('DELETE')
                                             @csrf
@@ -62,4 +71,23 @@
             </div>
         </div>
     </section>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function(){
+            $('.series-edit').click(function(){
+                let serieId = $(this).attr('value');
+                if( $('#serie-'+serieId).css('display') == 'none' )
+                {
+                    $('#serie-'+serieId).css('display', 'block');
+                    $('#serie-input-'+serieId).css('display', 'none');
+                } else
+                {
+                    $('#serie-input-'+serieId).css('display', 'flex');
+                    $('#serie-'+serieId).css('display', 'none');
+                }
+            });
+        });
+    </script> 
 @endsection

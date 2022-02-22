@@ -11,6 +11,8 @@ class Serie extends Model
 {
     use SoftDeletes, HasFactory, HasPrimaryKeyUuid;
 
+    protected $fillable = ['title'];
+
     public function getKey(): string
     {
         return 'uuid';
@@ -19,5 +21,10 @@ class Serie extends Model
     public function getKeyName(): string
     {
         return 'uuid';
+    }
+
+    public function seasons()
+    {
+        return $this->hasMany( Season::class );
     }
 }
