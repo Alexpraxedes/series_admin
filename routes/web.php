@@ -6,12 +6,14 @@ use App\Http\Controllers\SerieController;
 use App\Http\Controllers\SeasonController;
 use App\Http\Controllers\EpisodeController;
 
-Route::resources([
-    'series'    => SerieController::class,
-    'seasons'   => SeasonController::class,
-    'episodes'  => EpisodeController::class,
-]);
-
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::group(['middleware' => 'auth'], function() {
+    Route::resources([
+        'series'    => SerieController::class,
+        'seasons'   => SeasonController::class,
+        'episodes'  => EpisodeController::class,
+    ]);
+});
+
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

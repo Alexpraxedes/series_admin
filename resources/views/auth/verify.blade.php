@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title') Verificar email @endsection
 
 @section('content')
 <div class="container">
