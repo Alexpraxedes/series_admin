@@ -18,11 +18,11 @@ class Series
                 $extension = $requestImage->extension();
                 $imageName = md5($requestImage->getClientOriginalName() . strtotime('now')) . "." . $extension;
                 $request->image->move(public_path('img/series'), $imageName);
+                $serie->image = $imageName;
             }
             
             $serie = new Serie;
             $serie->title = $request->title;
-            $serie->image = $imageName;
 
             $serie->save();
 
