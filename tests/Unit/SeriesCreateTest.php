@@ -5,9 +5,13 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Models\Serie;
 use App\Services\Series;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class SeriesCreateTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /** @test */
     public function series_create()
     {
